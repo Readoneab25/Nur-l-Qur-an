@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Qur'an Audio Player • Full Quran</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Amiri', serif; }
+    .arabic { font-family: 'Scheherazade New', serif; direction: rtl; }
+  .text-1xl:hover{
+color:gold ;
+transition: 1s ease-in-out
+  }
+  </style>
+</head>
+<body class="bg-zinc-950 text-emerald-100 min-h-screen">
+
+<header class="bg-zinc-900 sticky top-0 z-50 border-b border-emerald-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="text-3xl sm:text-4xl">ﷺ</div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-amber-400">Qur'an Audio</h1>
+    </div>
+    <div class="text-1xl sm:text-2xl"><a href="index.html">Home</a>
+    </div>
+    <select id="reciter" onchange="changeReciter()" 
+            class="bg-zinc-800 border border-emerald-700 rounded-xl px-4 py-2.5 text-sm sm:text-base text-white focus:outline-none focus:border-amber-400">
+      <!-- filled by JS -->
+    </select>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+
+  <!-- Surah List -->
+  <div class="w-full lg:w-5/12 xl:w-96 order-2 lg:order-1">
+    <input id="search" placeholder="Search surah..." onkeyup="filterSurahs()"
+           class="w-full bg-zinc-900 border border-emerald-700 rounded-3xl px-5 py-3.5 text-white mb-5 focus:outline-none focus:border-amber-400 placeholder:text-emerald-400 text-base">
+    <div id="surah-list" class="space-y-3 max-h-[50vh] sm:max-h-[60vh] lg:max-h-[75vh] overflow-y-auto pr-2"></div>
+  </div>
+
+  <!-- Player -->
+  <div class="w-full lg:flex-1 bg-zinc-900 rounded-3xl p-6 sm:p-8 lg:p-10 border border-emerald-700 order-1 lg:order-2">
+    <div class="text-center mb-8 sm:mb-10">
+      <p class="text-emerald-400 text-xs sm:text-sm uppercase tracking-wider">Now Playing</p>
+      <p id="surah-name" class="arabic text-4xl sm:text-5xl lg:text-6xl font-bold text-amber-400 mt-3 sm:mt-4">Select a Surah</p>
+      <p id="surah-info" class="text-emerald-300 mt-1.5 sm:mt-2 text-base sm:text-lg">—</p>
+    </div>
+
+    <div class="flex justify-center items-center gap-10 sm:gap-12 lg:gap-16 mb-8 sm:mb-10">
+      <button onclick="prevAyah()" class="text-4xl sm:text-5xl lg:text-6xl text-emerald-400 hover:text-white transition">⏮</button>
+      <button id="play-btn" onclick="togglePlay()"
+              class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-amber-400 hover:bg-amber-300 text-zinc-950 rounded-3xl flex items-center justify-center text-5xl sm:text-6xl lg:text-7xl shadow-2xl transition-all">
+        ▶
+      </button>
+      <button onclick="nextAyah()" class="text-4xl sm:text-5xl lg:text-6xl text-emerald-400 hover:text-white transition">⏭</button>
+    </div>
+
+    <div class="px-2 sm:px-4 lg:px-8">
+      <div id="progress-bar" class="h-2 sm:h-2.5 lg:h-3 bg-emerald-900 rounded-full cursor-pointer overflow-hidden">
+        <div id="progress" class="h-full bg-gradient-to-r from-amber-400 to-yellow-500 w-0 transition-all duration-100"></div>
+      </div>
+      <div class="flex justify-between text-xs sm:text-sm text-emerald-300 mt-2 sm:mt-3 font-mono">
+        <span id="current-time">0:00</span>
+        <span id="total-time">0:00</span>
+      </div>
+    </div>
+
+    <div class="mt-8 sm:mt-10 px-2 sm:px-4 lg:px-8 flex items-center gap-3 sm:gap-4">
+      <span class="text-xl sm:text-2xl">🔊</span>
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="0.9"
+             class="flex-1 accent-amber-400 h-1.5 sm:h-2" oninput="audio.volume = this.value">
+    </div>
+  </div>
+</div>
+
+<audio id="audio" class="hidden"></audio>
+
+<script>
+// ──────────────────────────────────────────────
+let allSurahs = [];
+let currentSurah = null;
+let currentAudioUrls = [];
+let currentIndex = 0;
+let isPlaying = false;
+
+const reciterMap = {
+  "Mishary Rashid Alafasy": "ar.alafasy",
+  "Mahmoud Khalil Al-Husary": "ar.husary",
+  "Muhammad Siddiq Al-Minshawi": "ar.minshawi",
+  "Maher Al Muaiqly": "ar.mahermuaiqly",
+  "Abdurrahman As-Sudais": "ar.abdurrahmaansudais"
+};
+
+const audio = document.getElementById('audio');
+
+audio.onerror = () => {
+  alert("Audio failed to load.\n\nTry:\n1. Use local server app (not file://)\n2. Switch reciter\n3. Check internet / VPN");
+};
+
+async function loadSurahs() {
+  try {
+    const res = await fetch('https://api.alquran.cloud/v1/surah');
+    const data = await res.json();
+    allSurahs = data.data;
+    renderSurahs(allSurahs);
+  } catch (e) {
+    console.error("Failed to load surahs:", e);
+  }
+}
+
+function renderSurahs(list) {
+  const container = document.getElementById('surah-list');
+  container.innerHTML = '';
+  list.forEach(s => {
+    const div = document.createElement('div');
+    div.className = "bg-zinc-800 hover:bg-zinc-700 p-4 sm:p-5 rounded-3xl cursor-pointer transition-all border border-emerald-700 text-base sm:text-lg";
+    div.innerHTML = `
+      <div class="flex gap-3 sm:gap-4 items-center">
+        <div class="text-3xl sm:text-4xl font-bold text-amber-400 min-w-[2.5rem] text-center">${s.number}</div>
+        <div>
+          <div class="arabic">${s.name}</div>
+          <div class="text-emerald-300 text-sm sm:text-base">${s.englishName} • ${s.numberOfAyahs} ayahs</div>
+        </div>
+      </div>
+    `;
+    div.onclick = () => playSurah(s);
+    container.appendChild(div);
+  });
+}
+
+function filterSurahs() {
+  const term = document.getElementById('search').value.toLowerCase();
+  const filtered = allSurahs.filter(s => 
+    s.name.toLowerCase().includes(term) || s.englishName.toLowerCase().includes(term)
+  );
+  renderSurahs(filtered);
+}
+
+function playSurah(surah) {
+  currentSurah = surah;
+  document.getElementById('surah-name').textContent = surah.name;
+  document.getElementById('surah-info').textContent = surah.englishName;
+
+  const reciterCode = reciterMap[document.getElementById('reciter').value];
+  const padded = String(surah.number).padStart(3, '0');
+
+  currentAudioUrls = [];
+  for (let i = 1; i <= surah.numberOfAyahs; i++) {
+    const ayahPadded = String(i).padStart(3, '0');
+    currentAudioUrls.push(`https://cdn.islamic.network/quran/audio/128/\( {reciterCode}/ \){padded}${ayahPadded}.mp3`);
+  }
+
+  currentIndex = 0;
+  playCurrent();
+}
+
+function playCurrent() {
+  if (currentIndex >= currentAudioUrls.length) return;
+  audio.src = currentAudioUrls[currentIndex];
+  audio.play().catch(() => {});
+  isPlaying = true;
+  document.getElementById('play-btn').innerHTML = '❚❚';
+}
+
+function togglePlay() {
+  if (!currentSurah) return;
+  if (isPlaying) {
+    audio.pause();
+    document.getElementById('play-btn').innerHTML = '▶';
+  } else {
+    audio.play();
+    document.getElementById('play-btn').innerHTML = '❚❚';
+  }
+  isPlaying = !isPlaying;
+}
+
+function prevAyah() {
+  if (!currentSurah) return;
+  currentIndex = Math.max(0, currentIndex - 1);
+  playCurrent();
+}
+
+function nextAyah() {
+  if (!currentSurah) return;
+  currentIndex++;
+  playCurrent();
+}
+
+function changeReciter() {
+  if (currentSurah) playSurah(currentSurah);
+}
+
+audio.ontimeupdate = () => {
+  if (!audio.duration) return;
+  const percent = (audio.currentTime / audio.duration) * 100;
+  document.getElementById('progress').style.width = percent + '%';
+  document.getElementById('current-time').textContent = formatTime(audio.currentTime);
+  document.getElementById('total-time').textContent = formatTime(audio.duration);
+};
+
+function formatTime(seconds) {
+  if (!seconds) return "0:00";
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+  return `\( {min}: \){sec < 10 ? '0' : ''}${sec}`;
+}
+
+audio.onended = () => {
+  currentIndex++;
+  playCurrent();
+};
+
+document.getElementById('progress-bar').addEventListener('click', e => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const percent = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = percent * audio.duration;
+});
+
+window.onload = () => {
+  const select = document.getElementById('reciter');
+  Object.keys(reciterMap).forEach(name => {
+    const opt = document.createElement('option');
+    opt.textContent = name;
+    select.appendChild(opt);
+  });
+  loadSurahs();
+};
+</script>
+</body>
+</html>

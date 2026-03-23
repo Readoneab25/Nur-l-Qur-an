@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Al-Qur'an • Read Full Text</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Amiri', serif; }
+    .arabic { font-family: 'Scheherazade New', serif; direction: rtl; text-align: right; line-height: 2.2; }
+    .ayah-number {
+      display: inline-block;
+      width: 2.2rem;
+      height: 2.2rem;
+      line-height: 2.2rem;
+      text-align: center;
+      background: #065f46;
+      color: #fcd34d;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin: 0 0.5rem 0 0.3rem;
+    }
+    .text-1xl:hover{
+      color: gold;
+      transition: 1s ease-in-out;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-emerald-100 min-h-screen">
+
+<!-- Header -->
+<header class="bg-zinc-900 sticky top-0 z-50 border-b border-emerald-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="text-3xl sm:text-4xl">ﷺ</div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-amber-400">Al-Qur'an</h1>
+    </div><div class="text-1xl sm:text-2xl"><a href="index.html">Home</a></div>
+      
+
+    <div class="w-full sm:w-auto flex items-center gap-3">
+      <input id="search" placeholder="Search surah..." onkeyup="filterSurahs()"
+             class="flex-1 sm:flex-none bg-zinc-800 border border-emerald-700 rounded-3xl px-5 py-3 text-white focus:outline-none focus:border-amber-400 placeholder:text-emerald-400">
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-10">
+
+  <!-- Surah List View -->
+  <div id="list-view" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+    <!-- Filled by JS -->
+  </div>
+
+  <!-- Reading View (hidden by default) -->
+  <div id="reading-view" class="hidden">
+    <button onclick="backToList()" 
+            class="mb-6 inline-flex items-center gap-2 text-emerald-400 hover:text-amber-400 transition">
+      ← Back to Surah List
+    </button>
+
+    <div class="bg-zinc-900 rounded-2xl p-6 sm:p-8 lg:p-10 border border-emerald-700">
+      <div class="text-center mb-8">
+        <p id="reading-title" class="arabic text-4xl sm:text-5xl lg:text-6xl font-bold text-amber-400"></p>
+        <p id="reading-subtitle" class="text-emerald-300 mt-3 text-lg sm:text-xl"></p>
+      </div>
+
+      <div id="ayahs-container" class="space-y-8 sm:space-y-10 text-lg sm:text-xl leading-relaxed"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+let allSurahs = [];
+
+async function loadSurahs() {
+  try {
+    const res = await fetch('https://api.alquran.cloud/v1/surah');
+    const data = await res.json();
+    allSurahs = data.data;
+    renderSurahList(allSurahs);
+  } catch (err) {
+    console.error("Failed to load surahs:", err);
+    document.getElementById('list-view').innerHTML = '<p class="col-span-full text-center text-red-400 py-20 text-xl">Could not load surahs. Check internet.</p>';
+  }
+}
+
+function renderSurahList(surahs) {
+  const container = document.getElementById('list-view');
+  container.innerHTML = '';
+  surahs.forEach(s => {
+    const card = document.createElement('div');
+    card.className = "bg-zinc-800 hover:bg-zinc-700 border border-emerald-800 hover:border-amber-400 rounded-2xl p-5 sm:p-6 cursor-pointer transition-all";
+    card.innerHTML = `
+      <div class="flex items-start gap-4">
+        <div class="text-3xl sm:text-4xl font-bold text-amber-400 min-w-[2.5rem] text-center">${s.number}</div>
+        <div class="flex-1">
+          <div class="arabic text-2xl sm:text-3xl">${s.name}</div>
+          <div class="text-emerald-300 text-base sm:text-lg mt-1">${s.englishName} • ${s.numberOfAyahs} ayahs • ${s.revelationType}</div>
+        </div>
+      </div>
+    `;
+    card.onclick = () => openSurah(s.number);
+    container.appendChild(card);
+  });
+}
+
+async function openSurah(surahNumber) {
+  try {
+    // Arabic text (Uthmani)
+    const arRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/quran-uthmani`);
+    const arData = await arRes.json();
+
+    // English translation (Saheeh International)
+    const enRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/en.sahih`);
+    const enData = await enRes.json();
+
+    const surah = arData.data;
+    const ayahs = surah.ayahs.map((a, i) => ({
+      number: a.numberInSurah,
+      arabic: a.text,
+      english: enData.data.ayahs[i].text
+    }));
+
+    // Show reading view
+    document.getElementById('list-view').classList.add('hidden');
+    document.getElementById('reading-view').classList.remove('hidden');
+
+    document.getElementById('reading-title').textContent = surah.name;
+    document.getElementById('reading-subtitle').textContent = `${surah.englishName} • ${surah.numberOfAyahs} ayahs • ${surah.revelationType}`;
+
+    const container = document.getElementById('ayahs-container');
+    container.innerHTML = '';
+
+    ayahs.forEach(ayah => {
+      const div = document.createElement('div');
+      div.className = "flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center p-4 sm:p-6 bg-zinc-800/50 rounded-xl border border-emerald-900/50";
+      div.innerHTML = `
+        <div class="ayah-number">${ayah.number}</div>
+        <div class="flex-1">
+          <p class="arabic text-2xl sm:text-3xl leading-relaxed">${ayah.arabic}</p>
+          <p class="text-emerald-200 mt-4 text-base sm:text-lg">${ayah.english}</p>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+
+    window.scrollTo(0, 0);
+  } catch (err) {
+    alert("Failed to load surah text. Check internet.");
+    console.error(err);
+  }
+}
+
+function backToList() {
+  document.getElementById('reading-view').classList.add('hidden');
+  document.getElementById('list-view').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+
+function filterSurahs() {
+  const term = document.getElementById('search').value.toLowerCase().trim();
+  const filtered = allSurahs.filter(s => 
+    s.name.toLowerCase().includes(term) ||
+    s.englishName.toLowerCase().includes(term) ||
+    String(s.number).includes(term)
+  );
+  renderSurahList(filtered);
+}
+
+window.onload = () => {
+  loadSurahs();
+};
+</script>
+</body>
+</html>

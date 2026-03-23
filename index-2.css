@@ -1,0 +1,303 @@
+*{
+    padding: 0;
+    margin: auto;
+    box-sizing: border-box;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+
+}
+body{
+    background-color: rgb(20, 65, 20);
+}
+header{
+    position: fixed;
+    display: flex;
+    width: 100%;
+    top: 0;
+    font-size: larger;
+    background-color: black;
+   }
+header li{
+    display: flex;
+    color: rgb(207, 248, 207);
+}
+header p{
+    font-size: 70px;
+    width: 70px;
+    height: 70px;
+    background-color: gold;
+    border-radius: 50%;
+    text-align: center;
+}
+header .q{
+    font-size: 30px;
+    display: block;
+    color: gold;
+}
+header li button{
+    min-width: 200px;
+    border-radius: 20px;
+    font-weight: bolder;
+    height: 50px;
+    font-size: 25px;
+    background-color: gold;
+border: none;
+}
+header li button a{
+    color: black;
+}
+header li button a:hover{
+    color: rgb(3, 31, 3);
+    border: 1px solid rgb(3, 31, 3);
+}
+ header a{
+    text-decoration: none;
+    color: rgb(207, 248, 207);
+}
+header a:hover{
+    color: gold ;
+    transition: 1s ease-in-out;
+}
+.bt,.btn{
+    display: none;
+}
+#tog,#to{
+    display: none;
+}
+.s1{
+    text-align: center;
+    margin-top: 40px;
+}
+.s1 h1{
+    font-size: 100px;
+    color: gold;
+    padding-top: 70px;
+}
+.s1 h2{
+    font-size: 30px;
+    color: rgb(207, 248, 207);
+
+}
+.s1 .card{
+    width: 70%;
+    min-height: 300px;
+    text-align: center;
+    margin-top: 50px;
+    background-color: rgb(2, 26, 2);
+    border-radius: 20px;
+    border: 2px solid gold;
+}
+.s1 .card h2{
+    color: white;
+    line-height: 50px;
+    padding-top: 60px;
+}
+.s1 .card p{
+    color: gold;
+    padding-top: 50px;
+}
+.s2{
+    grid-template-columns: repeat(2,1fr);
+    display: grid;
+    width: 72%;
+    grid-row-gap: 0px;
+    margin-top: 100px;
+    height: 100vh;
+}
+.s2 .card{
+    width: 95%;
+    min-height: 250px;
+    background-color:rgba(1, 8, 1, 0.911) ;
+    border-radius: 20px;
+    text-align: center;
+    font-size: xx-large;
+    cursor: pointer;
+    padding-top: 50px;
+}
+.s2 .card:hover{
+    background-color:rgb(9, 39, 9) ;
+    transition: 1s ease-in-out;
+    box-shadow: 0 0 2px;
+}
+.s2 .card h4{
+    color: rgb(207, 248, 207);
+}
+.s2 .card p{
+    color: rgb(79, 145, 112);
+}
+.cont{
+    display: flex;
+    width: 40%;
+}
+#nu{
+    font-weight: lighter;
+}
+footer{
+    background-color:rgba(1, 8, 1, 0.911) ;
+    color: rgb(79, 145, 112);
+   text-align: center;
+   padding-top: 50px;
+   padding-bottom: 50px;
+   border-top:2px solid rgb(79, 145, 112) ;
+}
+@media(max-width:1000px){
+    header p{
+        scale: 0.9;
+            }
+            header .q{
+                scale: 0.9;
+            }
+            header li button{
+                scale: 0.9;
+            }
+            #to{
+                scale: 0.9;
+            }
+            #tog{
+                scale: 0.9;
+            }
+            .s1 h1{
+                font-size: 80px;
+            }
+            .s1 h2{
+                font-size: 30px;
+            }
+            /* .s2{
+                height: 90vh;
+                width: 90%;
+            } */
+            .s2 .card h4{
+                font-size: 25px;
+            }
+            .s2 .card p{
+                font-size: 25px;
+            }
+.cont{
+    display: grid;
+    position: absolute;
+    height: 90vh;
+    transition: 1s ease-in-out;
+    top: 100%;
+    box-shadow: 0 0 10px;
+    margin: 0 100%;
+    width: 50%;
+    background-color: rgb(2, 26, 2);
+}
+header .bt{
+    display: none;
+}
+header li span{
+    font-size: xx-large;
+    cursor: pointer;
+    width: 40px;
+    padding-left: 10px;
+}
+#tog{
+    display: flex;
+}
+#to{
+    display: none;
+}
+header li button{
+    min-width: 130px;
+    margin-left: 5%;
+    border-radius: 20px;
+    font-weight: bold;
+    height: 50px;
+    font-size: 20px;
+    background-color: gold;
+border: none;
+}
+}
+@media(max-width:550px){
+    header p{
+scale: 0.7;
+    }
+    header .q{
+        scale: 0.7;
+    }
+    header li button{
+        scale: 0.7;
+        margin-left: 0;
+    }
+    #to{
+        scale: 0.7;
+    }
+    #tog{
+        scale: 0.7;
+    }
+    .s1 h1{
+        font-size: 60px;
+    }
+    .s1 h2{
+        font-size: 20px;
+    }
+    .s2 .card{
+        /* scale: 0.9; */
+        padding-top: 70px;
+        height: 200px;
+        max-width: 180px;
+    }
+    .s2{
+        height: 90vh;
+        width: 90%;
+    }
+    .s2 .card h4{
+        font-size: 20px;
+    }
+    .s2 .card p{
+        font-size: 20px;
+    }
+}
+@media(max-width:500px){
+    .s1 .card p{
+        padding-bottom: 50px;
+    }
+}
+
+@media(max-width:477px){
+    .s1 .card p{
+    padding-top: 10px;
+    }
+    header p{
+        scale: 0.6;
+    }
+    .s1 .card{
+        width: 90%;
+    }
+    .s2{
+        width: 100%;
+        display: grid;
+        height: 100%;
+        grid-template-columns: none;
+    }
+    .s2 .card{
+        max-width:80%;
+        margin-top: 30px;
+    }
+    header li button{
+        display: none;
+    }
+    header .bt,.btn{
+        display: flex;
+    }
+.cont{
+    text-align: center;
+}
+/* .s2{
+    grid-template-columns: repeat(2,1fr);
+    display: grid;
+    width: 72%;
+    grid-row-gap: 0px;
+    margin-top: 100px;
+    height: 100vh;
+}
+.s2 .card{
+    width: 95%;
+    min-height: 250px;
+    background-color:rgba(1, 8, 1, 0.911) ;
+    border-radius: 20px;
+    text-align: center;
+    font-size: xx-large;
+    padding-top: 50px;
+} */
+}
