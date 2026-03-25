@@ -1,4 +1,3 @@
-
 document.getElementById("tog").onclick = function(){
     document.getElementById("cont").style.margin = "0 50%"
     document.getElementById("tog").style.display = "none"
@@ -13,7 +12,6 @@ document.getElementById("s1").onclick = function(){
     document.getElementById("cont").style.margin = "0 100%"
     document.getElementById("tog").style.display = "flex"
     document.getElementById("to").style.display = "none"
-
 }
 document.getElementById("s2").onclick = function(){
     document.getElementById("cont").style.margin = "0 100%"

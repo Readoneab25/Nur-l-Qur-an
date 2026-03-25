@@ -13,9 +13,15 @@
       transform: translateY(-6px);
       box-shadow: 0 20px 25px -5px rgba(6, 78, 59, 0.4);
     }
-    .text-2xl:hover{
+    #ho{
+      color: rgb(193, 230, 193);
+    }
+    #ho:hover{
 color:gold ;
 transition: 1s ease-in-out
+  }
+  #head{
+     font-size: x-large;
   }
   </style>
 </head>
@@ -25,10 +31,10 @@ transition: 1s ease-in-out
 <header class="bg-zinc-900/90 backdrop-blur-sm sticky top-0 z-50 border-b border-emerald-900/50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-4">
     <div class="flex items-center gap-3">
-      <div class="text-3xl text-amber-200">﷽</div>
-      <h1 class="text-1xl sm:text-3xl font-bold text-amber-200">99 Names of Allah</h1>
+      <!-- <div class="text-3xl text-amber-200">﷽</div> -->
+      <h1 class="text-1xl sm:text-3xl font-bold text-amber-200" id="head">99 Names of Allah</h1>
     </div>
-    <div class="text-2xl text-amber-200"><a href="index.html"  >Home</a></div>
+    <div class="text-2xl text-amber-200" id="ho"><a href="index.html"  >Home</a></div>
     <input id="search" placeholder="Search by name or meaning..." onkeyup="filterNames()"
            class="w-full sm:w-80 bg-zinc-800/80 border border-emerald-800 rounded-3xl px-5 py-3 text-white focus:outline-none focus:border-amber-400 placeholder:text-emerald-400">
   </div>

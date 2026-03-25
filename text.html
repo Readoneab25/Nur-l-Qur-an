@@ -27,6 +27,9 @@
       transition: 1s ease-in-out;
       cursor: pointer;
     }
+    #search{
+      width: 90%;
+    }
   </style>
 </head>
 <body class="bg-zinc-950 text-emerald-100 min-h-screen">
@@ -37,9 +40,7 @@
     <div class="flex items-center gap-3">
       <div class="text-3xl sm:text-4xl">ﷺ</div>
       <h1 class="text-2xl sm:text-3xl font-bold text-amber-400">Al-Qur'an</h1>
-    </div><div class="text-1xl sm:text-2xl"><a href="index.html">Home</a></div>
-      
-
+    </div><div class="text-1xl sm:text-2xl" id="ho"><a href="index.html">Home</a></div>
     <div class="w-full sm:w-auto flex items-center gap-3">
       <input id="search" placeholder="Search surah..." onkeyup="filterSurahs()"
              class="flex-1 sm:flex-none bg-zinc-800 border border-emerald-700 rounded-3xl px-5 py-3 text-white focus:outline-none focus:border-amber-400 placeholder:text-emerald-400">

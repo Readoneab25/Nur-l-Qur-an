@@ -108,7 +108,6 @@ async function loadSurahs() {
     renderSurahs(allSurahs);
   } catch (e) {
     console.error("Failed to load surahs:", e);
-    alert("Could not fetch surah list. Please check your internet connection and try again.");
   }
 }
 
@@ -151,8 +150,7 @@ function playSurah(surah) {
   currentAudioUrls = [];
   for (let i = 1; i <= surah.numberOfAyahs; i++) {
     const ayahPadded = String(i).padStart(3, '0');
-    // ✅ FIXED URL
-    currentAudioUrls.push(`https://cdn.islamic.network/quran/audio/128/ar.alafasy/001001.mp3`);
+    currentAudioUrls.push(`https://cdn.islamic.network/quran/audio/128/\( {reciterCode}/ \){padded}${ayahPadded}.mp3`);
   }
 
   currentIndex = 0;
@@ -160,14 +158,9 @@ function playSurah(surah) {
 }
 
 function playCurrent() {
-  if (currentIndex >= currentAudioUrls.length) {
-    // Finished the surah – stop or loop (here we stop)
-    isPlaying = false;
-    document.getElementById('play-btn').innerHTML = '▶';
-    return;
-  }
+  if (currentIndex >= currentAudioUrls.length) return;
   audio.src = currentAudioUrls[currentIndex];
-  audio.play().catch(err => console.error("Play error:", err));
+  audio.play().catch(() => {});
   isPlaying = true;
   document.getElementById('play-btn').innerHTML = '❚❚';
 }
@@ -178,7 +171,7 @@ function togglePlay() {
     audio.pause();
     document.getElementById('play-btn').innerHTML = '▶';
   } else {
-    audio.play().catch(err => console.error("Play error:", err));
+    audio.play();
     document.getElementById('play-btn').innerHTML = '❚❚';
   }
   isPlaying = !isPlaying;
@@ -192,12 +185,8 @@ function prevAyah() {
 
 function nextAyah() {
   if (!currentSurah) return;
-  if (currentIndex + 1 < currentAudioUrls.length) {
-    currentIndex++;
-    playCurrent();
-  } else {
-    // Last ayah – do nothing or loop
-  }
+  currentIndex++;
+  playCurrent();
 }
 
 function changeReciter() {
@@ -216,7 +205,7 @@ function formatTime(seconds) {
   if (!seconds) return "0:00";
   const min = Math.floor(seconds / 60);
   const sec = Math.floor(seconds % 60);
-  return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  return `\( {min}: \){sec < 10 ? '0' : ''}${sec}`;
 }
 
 audio.onended = () => {
@@ -235,11 +224,10 @@ window.onload = () => {
   Object.keys(reciterMap).forEach(name => {
     const opt = document.createElement('option');
     opt.textContent = name;
-    opt.value = name;  // Set value explicitly
     select.appendChild(opt);
   });
   loadSurahs();
 };
-  </script>
+</script>
 </body>
 </html>
