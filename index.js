@@ -25,7 +25,7 @@ document.getElementById("sur").onclick = function(){
     window.location.href = "text.html"
 }
 document.getElementById("re").onclick = function(){
-    window.location.href = "resat.html"
+    window.location.href = "de.html"
 }
 document.getElementById("na").onclick = function(){
     window.location.href = "name.html"
